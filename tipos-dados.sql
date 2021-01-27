@@ -32,4 +32,14 @@ CREATE SCHEMA geral;
   
 */
 
+/*
+  ## TIPO DE DADOS - SERIAIS -> auto incremento 
+  -> SÃO NÚMEROS INTEIROS - GERAM O PRÓPRIO VALOR AUTOMATICAMENTE
+  
+  1) SMALLSERIAL -> 1 32767 -> 2 bytes armazena
+  2) SERIAL -> 1 a 2.14 X 10^9 -> 4 bytes armazena
+  3) BIGSERIAL -> 1 a 9.22 X 10^18 -> 8 bytes armazena
+  
+*/
+
 
