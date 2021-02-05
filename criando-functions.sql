@@ -1,0 +1,119 @@
+-- CRIANDO FUNCTIONS OU FUNÇÕES NO POSTGRESQL
+-- DEFINIÇÃO: CONJUNTO DE CÓDIGOS QUE SÃO EXECUTADOS DENTRO DE UMA TRANSAÇÃO COM A FINALIDADE
+-- DE FACILITAR A PROGRAMAÇÃO E OBTER O REAPROVEITAMENTO/REUTILIZAÇÃO DE CÓDIGOS.
+
+-- NO POSTGRESQL --> EXITEM 4 TIPOS DE FUNCTIONS OU FUNÇÕES
+/*
+  1) QUERY LANGUAGE FUNCTIONS (FUNÇÕES ESCRITAS EM SQL)
+  2) PROCEDURAL LANGUAGE FUNCTIONS (FUNÇÕES ESCRITAS EM, POR EXEMPLO: PL/pgSQL ou PL/py)
+  3) INTERNAL FUNCTIONS
+  4) C-LANGUAGE FUNCTIONS
+*/
+
+-- LINGUAGENS: 
+-- SQL
+-- PL/psSQL
+-- PL/Py
+-- PL/JAVA
+-- PL/Lua
+-- PL/PHP
+
+---> IDEMPOTÊNCIA:
+-- CRIANDO FUNÇÃO: --> CREATE OR REPLACE FUNCTION [nome da função]
+-- detalhes: MESMO NOME, MESMO TIPO DE RETORNO, MESMO NÚMERO DE PARÂMETROS/ARGUMENTOS
+
+-- VAMOS TRABALHAR COM 2 LINGUAGENS:
+---> SQL E PLPGSQL
+
+-- SEGURANÇA: --> SECURITY: INVOKER e DEFINER
+
+/*
+  --> CRIAR UMA FUNCTIONS OU FUNÇÃO QUE RECEBA DOIS NÚMEROS E FAÇA A SOMA DOS DOIS VALORES
+*/
+
+CREATE OR REPLACE FUNCTION fc_somar(numero1 INTEGER, numero2 INTEGER)
+RETURNS INTEGER
+LANGUAGE SQL AS
+$$
+  SELECT numero1 + numero2;
+$$;
+
+SELECT fc_somar(50,50);
+
+/*
+  --> CRIAR UMA FUNCTION/FUNÇÃO PARA ADICIONAR NOVOS BANCOS USANDO A LINGUAGEM: SQL
+*/
+
+CREATE OR REPLACE FUNCTION fc_adicionar_banco(b_numero INTEGER, b_nome VARCHAR, b_ativo BOOLEAN)
+RETURNS TABLE (numero INTEGER, nome VARCHAR)
+RETURNS NULL ON NULL INPUT
+LANGUAGE SQL AS
+$$
+ 
+   INSERT INTO public.banco (numero, nome, ativo)
+   VALUES (b_numero, b_nome, b_ativo);
+   
+   SELECT numero, nome 
+   FROM public.banco 
+   WHERE numero = b_numero;
+
+$$;
+
+SELECT fc_adicionar_banco(10, 'Banco Panamericao', false);
+
+SELECT * 
+FROM public.banco 
+WHERE numero = 10
+ORDER BY numero
+
+
+/*
+  --> CRIAR UMA FUNCTION/FUNÇÃO PARA ADICIONAR NOVOS BANCOS USANDO A LINGUAGEM: PLPGSQL
+*/
+CREATE OR REPLACE FUNCTION novo_banco(b_numero INTEGER, b_nome VARCHAR, b_ativo BOOLEAN)
+RETURNS BOOLEAN
+SECURITY INVOKER
+LANGUAGE PLPGSQL AS
+$$
+DECLARE variavel_id INTEGER;
+BEGIN
+    
+	SELECT INTO variavel_id numero FROM public.banco WHERE nome = b_nome;
+	-- se for nullo ou null não existe banco cadastrado com o número
+	IF variavel_id IS NULL THEN
+			INSERT INTO public.banco (numero, nome, ativo) VALUES (b_numero, b_nome, b_ativo);
+	ELSE
+		RETURN FALSE;
+	END IF;
+	
+	SELECT INTO variavel_id numero FROM public.banco WHERE nome = b_nome;
+	
+	IF variavel_id IS NULL THEN
+		RETURN FALSE;
+	ELSE
+		RETURN TRUE;
+	END IF;
+
+END;
+$$;
+
+
+-- INSERIR BANCO PELA FUNCTION/FUNÇÃO - NOVO_BANCO
+SELECT novo_banco(13, 'Banco Neon S.A', false);
+SELECT * FROM public.banco WHERE numero = 13;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
