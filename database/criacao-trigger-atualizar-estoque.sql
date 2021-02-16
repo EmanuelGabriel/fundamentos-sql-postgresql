@@ -13,7 +13,7 @@ ALTER COLUMN cod_produto TYPE INT USING cod_produto::integer;
 -- CRIANDO A TRIGGER 't_atualiza_estoque'
 -- SERÁ DISPARADA ANTES DA INSERÇÃO NA TABELA 'ITENSVENDA'
 
-CREATE TRIGGER t_atualiza_estoque
+CREATE TRIGGER trg_atualiza_estoque
 BEFORE INSERT ON privado.itensvenda
 FOR EACH ROW
 EXECUTE PROCEDURE atualizar_estoque();
@@ -52,7 +52,7 @@ $$ LANGUAGE plpgsql;
 
 -- INSERIR DADOS NA TABELA 'ITENSVENDA' PARA REALIZAR A VENDA
 INSERT INTO privado.itensvenda (cod_itensvenda, cod_venda, cod_produto, quantidade_vendida)
-VALUES (3, 3, 2, 7);
+VALUES (3, 3, 2, 4);
 
 -- EXIBIR OS DADOS DAS TABELAS
 SELECT * FROM privado.itensvenda;
